@@ -1,7 +1,7 @@
 {
   "name": "nigisuapi",
   "version": "1.0.0",
-  "description": "API REST sobre la base de datos Nigisu (SQL Anywhere, DSN 'sql tvnet') con documentacion Swagger.",
+  "description": "API REST sobre la base de datos Nigisu (SQL Anywhere, DSN 'sql sytsaq') con documentacion Swagger.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

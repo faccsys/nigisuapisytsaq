@@ -135,4 +135,72 @@ function createRepository({ table, columns, searchColumns = [] }) {
   return { table, columns, pk, list, findById, create, update, remove };
 }
 
-module.exports = { createRepository };
+/**
+ * Builds a list-only repository for a read-only view: no primary key, no
+ * INSERT/UPDATE/DELETE, ordered by its first column. Used by the vXXX views
+ * that only support GET /, so each one only needs a column list.
+ */
+function createReadOnlyRepository({ table, columns, searchColumns = [] }) {
+  const allColumnNames = columns.map((c) => c.name);
+  const filterableColumns = new Set(allColumnNames);
+  const booleanColumns = columns.filter((c) => c.type === 'boolean').map((c) => c.name);
+  const numberColumns = columns.filter((c) => c.type === 'number').map((c) => c.name);
+  const sortColumn = allColumnNames[0];
+
+  function castRow(row) {
+    if (!row) return row;
+    booleanColumns.forEach((name) => {
+      if (row[name] !== null && row[name] !== undefined) row[name] = row[name] === true || row[name] === 1 || row[name] === '1';
+    });
+    numberColumns.forEach((name) => {
+      if (row[name] !== null && row[name] !== undefined && typeof row[name] === 'string') row[name] = Number(row[name]);
+    });
+    return row;
+  }
+
+  async function count(where, params) {
+    const sql = `SELECT COUNT(*) AS total FROM ${table}${where ? ` WHERE ${where}` : ''}`;
+    const rows = await db.query(sql, params);
+    return Number(rows[0].total);
+  }
+
+  function buildWhere({ filters = {}, q }) {
+    const clauses = [];
+    const params = [];
+
+    Object.entries(filters).forEach(([name, val]) => {
+      if (!filterableColumns.has(name) || val === undefined) return;
+      clauses.push(`${name} = ?`);
+      params.push(val);
+    });
+
+    if (q && searchColumns.length) {
+      const searchClause = searchColumns.map((name) => `${name} LIKE ?`).join(' OR ');
+      clauses.push(`(${searchClause})`);
+      searchColumns.forEach(() => params.push(`%${q}%`));
+    }
+
+    return { where: clauses.join(' AND '), params };
+  }
+
+  async function list({ filters, q, page, pageSize } = {}) {
+    const safePageSize = clampInt(pageSize, DEFAULT_PAGE_SIZE, 1, MAX_PAGE_SIZE);
+    const safePage = clampInt(page, 1, 1, Number.MAX_SAFE_INTEGER);
+    const startAt = (safePage - 1) * safePageSize + 1;
+
+    const { where, params } = buildWhere({ filters, q });
+    const whereSql = where ? ` WHERE ${where}` : '';
+
+    const sql =
+      `SELECT TOP ${safePageSize} START AT ${startAt} ${allColumnNames.join(', ')} ` +
+      `FROM ${table}${whereSql} ORDER BY ${sortColumn}`;
+
+    const [rows, total] = await Promise.all([db.query(sql, params), count(where, params)]);
+
+    return { rows: rows.map(castRow), total, page: safePage, pageSize: safePageSize };
+  }
+
+  return { table, columns, list };
+}
+
+module.exports = { createRepository, createReadOnlyRepository };

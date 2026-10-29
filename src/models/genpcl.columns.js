@@ -1,7 +1,10 @@
 // Metadata de la tabla genpcl00 (Clientes), obtenida directamente del catalogo
-// de SQL Anywhere (syscolumn/sysdomain) via la DSN 'sql tvnet'.
+// ODBC (SQLColumns) via la DSN 'sql sytsaq'.
 // genpcl00 extiende a genper00 1 a 1: percodigo es PK y a la vez FK hacia
 // genper00.percodigo (todo cliente es una persona previamente creada).
+// A diferencia de otras instalaciones de esta base, esta DSN no tiene los
+// campos de "plan contratado" (pclvalplan, pclfecinstalacion, etc.) ni las
+// columnas de auditoria (usralt/usrchg/fecalt/fecchg) en esta tabla.
 // Todas las columnas NOT NULL de esta tabla, salvo percodigo, tienen un
 // default en la base de datos, por lo que no son 'required' en el API.
 module.exports = [
@@ -42,59 +45,10 @@ module.exports = [
   { name: 'pclcodasesor', type: 'string', length: 10, description: 'Codigo de asesor' },
   { name: 'pclsecuencia', type: 'number', description: 'Secuencia' },
   { name: 'peremaildocumentoselec', type: 'string', length: 100, description: 'Email para documentos electronicos' },
-  { name: 'pclcoordx', type: 'number', description: 'Coordenada X' },
-  { name: 'pclcoordy', type: 'number', description: 'Coordenada Y' },
-  { name: 'pcltipo', type: 'number', description: 'Tipo de cliente' },
-  { name: 'titcod', type: 'number', description: 'Codigo de titular' },
-  { name: 'titcod1', type: 'number', description: 'Codigo de titular 1' },
-  { name: 'titcod2', type: 'number', description: 'Codigo de titular 2' },
-  { name: 'carcod', type: 'number', description: 'Codigo de caracteristica' },
-  { name: 'carcod1', type: 'number', description: 'Codigo de caracteristica 1' },
-  { name: 'carcod2', type: 'number', description: 'Codigo de caracteristica 2' },
   { name: 'pcltipologia', type: 'number', description: 'Tipologia del cliente' },
   { name: 'pclrelacionado', type: 'string', length: 1, description: 'Cliente relacionado (S/N)' },
   { name: 'pclfecnac', type: 'date', description: 'Fecha de nacimiento' },
   { name: 'pclenviapdfjv', type: 'string', length: 1, description: 'Envia PDF/JV (S/N)' },
   { name: 'descodigorating', type: 'number', description: 'Codigo de rating (FK gendes)' },
   { name: 'pelcodigo', type: 'number', description: 'Codigo de elemento relacionado' },
-  { name: 'descodfidelidad', type: 'number', description: 'Codigo de fidelidad (FK gendes)' },
-  { name: 'pclnaps', type: 'string', length: 100, description: 'NAPS' },
-  { name: 'pclprorrogas', type: 'number', description: 'Cantidad de prorrogas' },
-  { name: 'tdocodigo', type: 'number', description: 'Codigo de tipo de documento fiscal' },
-  { name: 'pclapp', type: 'string', length: 10, description: 'Codigo de app' },
-  { name: 'pclvalinstalacion', type: 'number', description: 'Valor de instalacion' },
-  { name: 'pclvalplan', type: 'number', description: 'Valor del plan' },
-  { name: 'pclvalplanf', type: 'number', description: 'Valor del plan final' },
-  { name: 'pclvalins', type: 'number', description: 'Valor de instalacion (alterno)' },
-  { name: 'pclvalpflex', type: 'number', description: 'Valor plan flex' },
-  { name: 'pclvaladdplan', type: 'number', description: 'Valor adicional del plan' },
-  { name: 'pcldescripcion', type: 'string', length: 1000, description: 'Descripcion' },
-  { name: 'pclvaltotalplan', type: 'number', description: 'Valor total del plan' },
-  { name: 'pcldireccionip', type: 'string', length: 50, description: 'Direccion IP asignada' },
-  { name: 'pclfecinstalacion', type: 'date', description: 'Fecha de instalacion' },
-  { name: 'pclproximafact', type: 'number', description: 'Dia de proxima facturacion' },
-  { name: 'pclfecprorroga', type: 'date', description: 'Fecha de prorroga' },
-  { name: 'pclrevisadocartera', type: 'string', length: 1, description: 'Revisado por cartera (S/N)' },
-  { name: 'pclfecreinstalacion', type: 'date', description: 'Fecha de reinstalacion' },
-  { name: 'pclfecactualizacion', type: 'date', description: 'Fecha de ultima actualizacion de plan' },
-  { name: 'mtvcodigo', type: 'number', description: 'Codigo de motivo' },
-  { name: 'pclfecmtv', type: 'date', description: 'Fecha del motivo' },
-  { name: 'pclpagoparciales', type: 'string', length: 1, description: 'Acepta pagos parciales (S/N)' },
-  { name: 'pclfecactprog', type: 'date', description: 'Fecha de actualizacion programada' },
-  { name: 'pclvalmanutencion', type: 'number', description: 'Valor de manutencion' },
-  { name: 'usuario', type: 'string', length: 19, description: 'Usuario de acceso del cliente' },
-  { name: 'claveapp', type: 'string', length: 19, description: 'Clave de acceso a la app' },
-  { name: 'pclcxcnumtrx', type: 'number', description: 'Numero de transaccion de cuentas por cobrar' },
-  { name: 'pclreportable', type: 'string', length: 1, description: 'Reportable (S/N)' },
-
-  // Columna calculada
-  { name: 'pclfecinstalacions', type: 'string', readOnly: true, description: 'Fecha de instalacion en formato texto (calculada)' },
-
-  // Columnas de auditoria
-  { name: 'usralt', type: 'string', readOnly: true, description: 'Usuario que creo el registro' },
-  { name: 'usrchg', type: 'string', readOnly: true, description: 'Usuario que modifico el registro' },
-  { name: 'fecalt', type: 'date', readOnly: true, description: 'Fecha de creacion' },
-  { name: 'fecchg', type: 'date', readOnly: true, description: 'Fecha de modificacion' },
-  { name: 'hosalt', type: 'string', readOnly: true, description: 'Host/IP de creacion' },
-  { name: 'hoschg', type: 'string', readOnly: true, description: 'Host/IP de modificacion' },
 ];

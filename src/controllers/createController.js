@@ -71,4 +71,31 @@ function createController(model, { filterKeys = [] } = {}) {
   return { list, getOne, create, update, remove };
 }
 
-module.exports = { createController };
+/**
+ * Builds the list-only handler for a read-only view (no id lookup, no
+ * create/update/delete). Shared by every vXXX view controller.
+ */
+function createReadOnlyController(model, { filterKeys = [] } = {}) {
+  const list = asyncHandler(async (req, res) => {
+    const filters = {};
+    filterKeys.forEach((key) => {
+      if (req.query[key] !== undefined) filters[key] = req.query[key];
+    });
+
+    const { rows, total, page, pageSize } = await model.list({
+      filters,
+      q: req.query.q,
+      page: req.query.page,
+      pageSize: req.query.pageSize,
+    });
+
+    res.json({
+      data: rows,
+      meta: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) || 0 },
+    });
+  });
+
+  return { list };
+}
+
+module.exports = { createController, createReadOnlyController };

@@ -1,5 +1,5 @@
 // Metadata de la tabla genper00 (Personas), obtenida directamente del catalogo
-// de SQL Anywhere (syscolumn/sysdomain) via la DSN 'sql tvnet'.
+// ODBC (SQLColumns) via la DSN 'sql sytsaq'.
 // type: 'number' | 'string' | 'boolean' | 'date'
 // readOnly: columnas calculadas (nombre, nomape, direccion) o de auditoria
 //           (usralt/usrchg/fecalt/fecchg/hosalt/hoschg) que la base llena sola.
@@ -12,9 +12,9 @@ module.exports = [
   { name: 'destpodoc', type: 'number', description: 'Codigo de tipo de documento (FK gendes)' },
   { name: 'destpoper', type: 'number', description: 'Codigo de tipo de persona (FK gendes)' },
   { name: 'desdndemail', type: 'number', description: 'Codigo de dominio de email (FK gendes)' },
-  { name: 'perapellido', type: 'string', length: 250, required: true, description: 'Apellido (o razon social si es persona juridica)' },
-  { name: 'pernombre', type: 'string', length: 250, description: 'Nombre' },
-  { name: 'pernumid', type: 'string', length: 20, required: true, description: 'Numero de identificacion (cedula/RNC)' },
+  { name: 'perapellido', type: 'string', length: 100, required: true, description: 'Apellido (o razon social si es persona juridica)' },
+  { name: 'pernombre', type: 'string', length: 100, description: 'Nombre' },
+  { name: 'pernumid', type: 'string', length: 13, required: true, description: 'Numero de identificacion (cedula/RNC)' },
   { name: 'pertelef', type: 'string', length: 15, description: 'Telefono principal' },
   { name: 'perdirec1', type: 'string', length: 100, description: 'Direccion linea 1' },
   { name: 'perdirec2', type: 'string', length: 100, description: 'Direccion linea 2' },
@@ -46,12 +46,7 @@ module.exports = [
   { name: 'perempresa', type: 'string', length: 100, description: 'Nombre de la empresa donde trabaja' },
   { name: 'perempresatel', type: 'string', length: 50, description: 'Telefono de la empresa' },
   { name: 'peresalu', type: 'boolean', description: 'Es alumno' },
-  { name: 'perobservacion', type: 'string', length: 32767, description: 'Observaciones' },
-  { name: 'peresprd', type: 'boolean', description: 'Es proveedor de reaseguro/reserva (segun modulo)' },
-  { name: 'peresrem', type: 'boolean', description: 'Es remitente' },
-  { name: 'percoordenadas', type: 'string', length: 50, description: 'Coordenadas GPS' },
-  { name: 'perdirecdetalles', type: 'string', length: 500, description: 'Detalles adicionales de direccion' },
-  { name: 'perbarrio', type: 'string', length: 50, description: 'Barrio/sector' },
+  { name: 'perobservacion', type: 'string', description: 'Observaciones (texto largo)' },
 
   // Columnas calculadas por la base de datos (no se pueden escribir)
   { name: 'nombre', type: 'string', readOnly: true, description: 'Nombre completo calculado' },
